@@ -1,3 +1,2 @@
-rootProject.name = 'org.floblaf'
+rootProject.name = 'Codingame'
 include 'hypersonic'
-
