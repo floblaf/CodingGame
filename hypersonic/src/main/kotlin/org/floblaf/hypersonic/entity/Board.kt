@@ -1,28 +1,27 @@
-package org.floblaf.hypersonic
+package org.floblaf.hypersonic.entity
 
 class Board(val width: Int, val height: Int) {
 
-    val player = User(0,0)
-    private val matrice : Array<Array<Entity?>> = Array(width, { Array<Entity?>(height, { null }) })
+    private val grid: Array<Array<Entity?>> = Array(width, { x -> Array<Entity?>(height, { y -> Floor(x, y) }) })
 
-    fun set(e: LocatedEntity) {
-        matrice[e.x][e.y] = e
+    fun set(e: Entity) {
+        grid[e.x][e.y] = e
     }
 
     fun clear() {
         for (x in 0 until width) {
             for (y in 0 until height) {
-                matrice[x][y] = null
+                grid[x][y] = Floor(x, y)
             }
         }
     }
 
     fun getAt(x: Int, y: Int) : Entity? {
         if (x < 0 || x >= width || y < 0 || y >= height) {
-            return Outside()
+            return null
         }
-        System.err.println("$x, $y, ${matrice[x][y]}")
-        return matrice[x][y]
+        System.err.println("$x, $y, ${grid[x][y]}")
+        return grid[x][y]
     }
 
     fun boxHitByBomb(x: Int, y: Int, power: Int) : Int {
@@ -31,14 +30,14 @@ class Board(val width: Int, val height: Int) {
         }
         val test = (x-power..x+power).count { getAt(it, 0) is Box }
         System.err.println("$test")
-        return (x-power..x+power).count { getAt(it, y) is Box } + (y-power..y+power).count { getAt(x, it) is Box}
+        return (x-power..x+power).count { getAt(it, y) is Box } + (y-power..y+power).count { getAt(x, it) is Box }
     }
 
-    fun getNearestBox() : Box? {
+    fun getNearestBox(x: Int, y: Int) : Box? {
         var dist = 1
         while (dist <= height || dist <= width) {
-            for (i in player.x-dist..player.x+dist) {
-                for (j in player.y-(dist-Math.abs(i))..player.y+(dist-Math.abs(i))) {
+            for (i in x-dist..x+dist) {
+                for (j in y-(dist-Math.abs(i))..y+(dist-Math.abs(i))) {
                     if (getAt(i, j) is Box) {
                         return getAt(i, j) as Box
                     }
